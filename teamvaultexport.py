@@ -54,7 +54,12 @@ def get_page(url, auth, entries):
     fetches 1 page of password entries and parses its body to python dict
     """
     j = tv_get(url, auth)
-    res = j["results"]
+
+    try:
+        res = j["results"]
+    except KeyError:
+        print("No secrets found")
+        return None
 
     # loop over all entries and if a password is available, add it to the dict
     for n, entry in enumerate(res):
