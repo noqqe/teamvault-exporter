@@ -1,5 +1,17 @@
 #!/usr/bin/env python3
 
+"""
+What this script does:
+* exports all secret entries
+* exports only secrets that are available to the current user.
+* finds the LATEST revision of the password
+* writs a CUSTOM json as output.
+
+What this script does NOT:
+* exporting ALL versions (past versions) of a secret
+* exporting uploaded files from teamvault
+"""
+
 import requests
 import json
 import argparse
@@ -41,8 +53,9 @@ def get_page(url, auth, entries):
     res = j["results"]
 
     for n, entry in enumerate(res):
-        p = get_secret(entry["current_revision"], auth)
-        res[n]["password"] = p
+        if entry["content_type"] == "password":
+            p = get_secret(entry["current_revision"], auth)
+            res[n]["password"] = p
 
     entries.extend(res)
 
