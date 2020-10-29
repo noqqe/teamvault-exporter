@@ -32,16 +32,20 @@ def get_secret(url, auth):
     """
     fetch 1 password
     """
+
+    # Fetch latest revision
     if url is not None:
         j = tv_get(url, auth)
     else:
         return ""
 
+    # Fetch data from latest revision
     try:
         p = tv_get(j["data_url"], auth)["password"]
     except KeyError:
         p = ""
 
+    # Give password back
     return p
 
 
@@ -52,7 +56,9 @@ def get_page(url, auth, entries):
     j = tv_get(url, auth)
     res = j["results"]
 
+    # loop over all entries and if a password is available, add it to the dict
     for n, entry in enumerate(res):
+        print("Exporting {}".format(entry["name"]))
         if entry["content_type"] == "password":
             p = get_secret(entry["current_revision"], auth)
             res[n]["password"] = p
@@ -74,20 +80,23 @@ def main(auth, baseurl, out):
     # init empty result list
     entries = list()
 
+    # Loop over pages
     next_url = baseurl + "/api/secrets"
     while next_url is not None:
         next_url = get_page(next_url, auth, entries)
-        print(len(entries))
+        print("## Exported {} entries so far".format(len(entries)))
 
+    # Write json file
     export_jsonfile(entries, out)
 
-
+# Options
 parser = argparse.ArgumentParser()
 parser.add_argument("-a", "--auth", type=str, required=True, help="auth in user:pass form")
 parser.add_argument("-u", "--url", type=str, required=True, help="for example https://teamvault.acme.com")
 parser.add_argument("-o", "--output", type=str, required=True, help="output file")
 args = parser.parse_args()
 
-main(auth=args.a, baseurl=args.u, out=args.o)
+# start exporting
+main(auth=args.auth, baseurl=args.url, out=args.output)
 
 
