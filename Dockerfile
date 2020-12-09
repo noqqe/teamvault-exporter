@@ -1,5 +1,7 @@
 FROM jfloff/alpine-python:3.8-onbuild
 
+RUN apk add --update gnupg
+
 # Install App
 RUN mkdir /app
 WORKDIR /app
