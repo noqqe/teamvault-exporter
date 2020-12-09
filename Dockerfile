@@ -6,7 +6,9 @@ WORKDIR /app
 COPY teamvaultexport.py /app/
 RUN chmod +x /app/teamvaultexport.py
 
-# Setup Cronjob
-COPY periodic.sh /etc/periodic/15min/
-RUN chmod +x /etc/periodic/15min/periodic.sh
-CMD crond -f -l 5
+# Create Backup folder
+RUN mkdir -p /var/backups/teamvault/
+
+# Run Entrypoint
+COPY entrypoint.sh /entrypoint.sh
+CMD ["/entrypoint.sh"]
